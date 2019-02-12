@@ -85,6 +85,7 @@ function logger.add(level, ...)
         so i use '..' to concatenate string here and add them to the queue, because log queue count
         may be huge, and use table.concat concatenate them at log_by_lua stage later.
     ]]
+    -- optimize: if the length of content is more than 10000, consider cache the length.
     content[#content + 1] = conf.prefix..dst..", time:"..common.curTime()
 end
 

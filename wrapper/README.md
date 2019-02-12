@@ -2,11 +2,13 @@
 
 ## **Overview**
 
-This component working on wrapping all functions of a table for advanced features as tracer, typeChecking, autotest and so on. as a wrapper, you should implement `entry()`, `leave()` and `prepare()`. note that, `prepare()` adapt original object to wrapper's actual object with varargs forwarded by `wrap()`.
+This component working on wrapping an object (or the partial functions of an object) for advanced features as tracer, checker, autotest and so on. as a wrapper, you should implement `entry()`, `leave()` and `prepare()`. `prepare()` adapted original object to wrapper's actual object via `opt` forwarded by `wrap()`, and the actual object was invoked by `entry()` and `leave()`.
 
-About tracer, you can filter the tracing log and output them into the specified file, via `error_log` that setting in the nginx-*.conf, then get tracing log via `fetchTrace()` in [log](https://github.com/tweyseo/Mirana/tree/master/log) component.
+It's recommended to create wrappers in modules (folders), which was included the similar **module units**. note that, a **module unit** (or the partial functions of a **module unit**) can escape from wrapping via the `except` parameter that create the wrappers, and `inverse` parameter inversed the `except` list as a **module unit** (or the partial functions of a **module unit**) that need to wrap (this parameter was used for special wrappers that are rarely used), more details see [*wrap.lua*](https://github.com/tweyseo/Mirana/blob/master/wrapper/plugin/wrap.lua).
 
-As a final note, you are recommended to wrap tracer to the outermost layer to get the more accurate tracking results.
+About tracer, you can filter the tracing log and output them into the specified file via the `error_log` that setting in the nginx-*.conf, then get tracing log via `fetchTrace()` in [log](https://github.com/tweyseo/Mirana/tree/master/log) component and output them in the stage of `log_by_lua`, the behaviour of fetch and output on tracing log was the same as what we do on [log](https://github.com/tweyseo/Mirana/tree/master/log) component.
+
+As final note, you are recommended to use wrapper of tracer at the outermost layer to get the more accurate tracking results.
 
 ## **Useage**
 
@@ -15,7 +17,7 @@ local wrapper = require("wrapper.index")
 local object = require("/handler/test/hello")
 
 local Tracer = wrapper.TRACER
-local tracer = Tracer:new(Tracer.WARN)
+local tracer = Tracer:new(Tracer.WARN, { ["hello"] = {"tcp", "capture"} })
 tracer:wrap(object, { source = "/handler/test/hello" })
 object.http()
 -- more code
@@ -23,4 +25,4 @@ object.http()
 
 ## **TODO**
 
-1. typeChecking, autotest and more wrapper to be implemented later.
+1. checker, autotest and more wrapper to be implemented later.

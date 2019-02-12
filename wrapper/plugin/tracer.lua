@@ -1,5 +1,5 @@
 -- function reference
-local select = select
+local type = type
 local DEBUG, INFO, NOTICE, WARN, ERR = ngx.DEBUG, ngx.INFO, ngx.NOTICE, ngx.WARN, ngx.ERR
 local setmetatable = setmetatable
 -- include
@@ -25,10 +25,12 @@ local function add(source, functionName, elapsedTime)
         trace queue count may be huge, and use table.concat concatenate them at
         log_by_lua stage later.
     ]]
+    -- optimize: if the length of content is more than 10000, consider cache the length.
     content[#content + 1] = conf.prefix..source..":"..functionName.."(), elapsed:"..elapsedTime
 end
 
-function Tracer:new(level)
+-- except?, inverse?
+function Tracer:new(level, except, inverse)
     local sysLevel = errlog.get_sys_filter_level()
     if not level or level > sysLevel then
         log.warn("invalid log level: ", level, ", but system log level: ", sysLevel)
@@ -36,38 +38,36 @@ function Tracer:new(level)
     end
 
     local instance = {}
+    instance.except = except
+    instance.inverse = inverse
 
     setmetatable(instance, {  __index = self  })
 
     return instance
 end
 
-function Tracer.prepare(obj, ...)
-    if obj.source ~= nil then
+function Tracer:prepare(obj, opt)
+    local _ = self
+    if type(obj.source) == "string" then
         return
     end
 
-    local ext
-    for i = 1, select('#', ...) do
-        ext = select(i, ...)
-        if ext.source then
-            obj.source = ext.source
-            return
-        end
-    end
+    obj.source = opt.source or "nil source in Tracer:prepare() which forwarded by wrap()"
 end
 
 function Tracer:entry()
     self.startTime = common.curTime()
 end
 
-function Tracer:leave(obj, index)
+function Tracer:leave(obj, index, ...)
     if not self.startTime then
         log.warn("startTime is nil")
     end
 
     add(obj.source, index, common.elapsedTime(self.startTime))
     self.startTime = nil
+
+    return ...
 end
 
 Tracer.DEBUG = DEBUG

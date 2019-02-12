@@ -6,9 +6,9 @@ I use these components in my APIServer, two HttpServers and one TcpServer in a p
 
 In order to reduce the duplication of work and facilitate the management of code, i integrated the common components in a single git repository which servers as a git submodule for all the servers mentioned above.
 
-Because these components were coupled my business layer code, so i had to decouple them and retest the decoupled components, and those tests were certainly not as good as that the online product went through, **so welcome to report me the issues and i will solve them as soon as possible**.
+Because these components were coupled with my business layer code, so i had to decouple them and retest the decoupled components, and those tests were certainly not as good as that the online product went through, **so welcome to report me the issues and i will solve them as soon as possible**.
 
-There are glance of these public components:
+There are glance of these common components:
 
 - [**app:**](https://github.com/tweyseo/Mirana/tree/master/app) more minimalist web framework that refer to [lor](https://github.com/sumory/lor).
 - [**flowCtrl:**](https://github.com/tweyseo/Mirana/tree/master/flowCtrl) control the workflow of your code (parallel, parallelRace, parallelPro and so on).
@@ -33,4 +33,5 @@ A simple [TCPServer](https://github.com/tweyseo/OgreMagi) was served as a TCPSer
 2. performance optimization: follow [**performance guide**](http://wiki.luajit.org/Numerical-Computing-Performance-Guide) and avoid [**NYI**](http://wiki.luajit.org/NYI).
 
 ## **License**
+
 [MIT](https://github.com/tweyseo/Mirana/blob/master/LICENSE)
