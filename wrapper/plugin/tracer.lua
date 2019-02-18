@@ -47,25 +47,25 @@ function Tracer:new(level, except, inverse)
 end
 
 function Tracer:prepare(obj, opt)
-    local _ = self
-    if type(obj.source) == "string" then
-        return
+    local _, source = self, opt and opt.source
+    if type(source) ~= "string" then
+        log.warn("invalid source")
+        return false
     end
 
-    obj.source = opt.source or "nil source in Tracer:prepare() which forwarded by wrap()"
+    obj.source = source
+
+    return true
 end
 
 function Tracer:entry()
-    self.startTime = common.curTime()
+    local _ = self
+    return { common.curTime() }
 end
 
-function Tracer:leave(obj, index, ...)
-    if not self.startTime then
-        log.warn("startTime is nil")
-    end
-
-    add(obj.source, index, common.elapsedTime(self.startTime))
-    self.startTime = nil
+function Tracer:leave(obj, index, context, ...)
+    local _ = self
+    add(obj.source, index, common.elapsedTime(context[1]))
 
     return ...
 end

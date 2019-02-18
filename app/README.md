@@ -8,4 +8,4 @@ Even though there were many wonderful web frameworks like [lor](https://github.c
 
 ## **TODO**
 
-1. it will be implemented later.
+1. this component will finish initialization in int_worker_by_lua stage instead of triggering initialization by first user request like in lor.

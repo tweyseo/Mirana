@@ -14,9 +14,19 @@ function common.newTable(narr, nrec)
     return newTab(narr, nrec)
 end
 
-function common.reqId()
+function common.uuid()
     -- can not cache in lua var
     return ngx.var.request_id
+end
+
+--[[
+    ngx.var.request_id offered different unique id at every access, even if in the same request, so
+    set ngx.var.request_id to ngx.ctx.reqId at access_by_lua stage only, and use ngx.ctx.reqId as
+    current request id, ngx.var.request_id as uuid generator.
+]]
+function common.reqId()
+    -- can not cache in lua var
+    return ngx.ctx.reqId
 end
 
 common.curTime = ngx.now
@@ -27,7 +37,7 @@ function common.reqTime()
 end
 
 function  common.elapsedTime(t)
-    return common.curTime() - t
+    return common.curTime() - (t or 0)
 end
 
 function common.status()

@@ -29,7 +29,9 @@ local reqHandle = function(req, conf)
 end
 
 local respHandle = function(resp, conf)
+    local rawBody
     if resp.body then
+        rawBody = resp.body
         local contentType = resp.headers and resp.headers["Content-Type"]
         -- for multiple instances of request headers, the value of key will be a Lua (array) table
         if type(contentType) == "table" then contentType = concat(contentType, "; ") end
@@ -38,7 +40,7 @@ local respHandle = function(resp, conf)
         end
     end
 
-    return { status = resp.status, headers = resp.headers, body = resp.body }
+    return { status = resp.status, headers = resp.headers, body = resp.body, rawBody = rawBody }
 end
 
 --[[

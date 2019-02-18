@@ -9,28 +9,29 @@ local defaultTableLen = 5
 
 -- optimize: original object reflection and function copy
 local function filter(wrapper, originalObject)
-    -- skip invalid originalObject
-    if not originalObject then
+    -- skip invalid originalObject, even if wrapper.inverse is true
+    if type(originalObject) ~= "table" then
         return true
     end
 
-    local except = wrapper.except
-    local inverse = wrapper.inverse or false
-    local reflection = originalObject.reflection
-    if not except or not reflection then
-        return
+    local except, reflection, skip, inverse, details
+        = wrapper.except, originalObject.reflection, false, wrapper.inverse or false
+    if not except then
+        skip = false
+        goto rtn
     end
 
-    local details = except[reflection]
+    details = except[reflection]
     if details == nil then
-        return
+        skip = false
+        goto rtn
     end
     -- skip whole originalObject
     if details == true then
-        -- inverse
-        return not inverse and true or false
+        skip = true
+        goto rtn
     end
-    -- skip functions in originalObject
+
     if type(details) == "table" then
         local newObject
         if not inverse then
@@ -39,7 +40,6 @@ local function filter(wrapper, originalObject)
                 newObject[k] = originalObject[k]
             end
         else
-            -- inverse
             newObject = newTable(0, defaultTableLen)
             for k, v in pairs(originalObject) do
                 if details[k] ~= true then
@@ -50,6 +50,9 @@ local function filter(wrapper, originalObject)
 
         return false, newObject
     end
+
+    ::rtn::
+    return (not inverse and skip) or (inverse and not skip)
 end
 
 return function(wrapper, originalObject, opt)
@@ -59,7 +62,10 @@ return function(wrapper, originalObject, opt)
     end
     -- newObject return by filter include functions that escape from wrapping
     newObject = newObject or {}
-    wrapper:prepare(newObject, opt)
+    if wrapper:prepare(newObject, opt) == false then
+        return originalObject
+    end
+
     return setmetatable(newObject, { __index = function(self, index)
         local property = originalObject[index]
         if type(property) ~= "function" then
@@ -67,8 +73,8 @@ return function(wrapper, originalObject, opt)
         end
 
         return function(...)
-            wrapper:entry(self, index, ...)
-            return wrapper:leave(self, index, originalObject[index](...))
+            return wrapper:leave(self, index, wrapper:entry(self, index, ...)
+                , originalObject[index](...))
         end
     end})
 end

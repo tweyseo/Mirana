@@ -108,8 +108,8 @@ function utils.deepCopyArray(src)
     local dst
     if type(src) == "table" then
         dst = newTable(#src, 0)
-        for k, v in ipairs(src) do
-            dst[k] = v
+        for i, v in ipairs(src) do
+            dst[i] = v
         end
     else
         dst = src

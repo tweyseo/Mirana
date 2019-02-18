@@ -57,8 +57,9 @@ local function fileHandle(self, fullPath, requireTable)
     -- do wrapper
     for _,  wrapper in ipairs(self.wrappers) do
         if wrapper then
-            -- source for tracer wrapper
-            object = wrapper:wrap(object, { source = objectPath })
+            -- source for tracer wrapper and checker wrapper
+            -- name for checker wrapper
+            object = wrapper:wrap(object, { source = objectPath, name = objectName })
         end
     end
 

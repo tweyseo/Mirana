@@ -53,6 +53,7 @@ end
 
 local function respHandle(oldHeaders, resp)
     if resp.body then
+        resp.rawBody = resp.body
         local contentType = resp.header and resp.header["Content-Type"]
         -- for multiple instances of request headers, the value of key will be a Lua (array) table
         if type(contentType) == "table" then contentType = concat(contentType, "; ") end

@@ -8,6 +8,8 @@ It's recommended to create wrappers in modules (folders), which was included the
 
 About tracer, you can filter the tracing log and output them into the specified file via the `error_log` that setting in the nginx-*.conf, then get tracing log via `fetchTrace()` in [log](https://github.com/tweyseo/Mirana/tree/master/log) component and output them in the stage of `log_by_lua`, the behaviour of fetch and output on tracing log was the same as what we do on [log](https://github.com/tweyseo/Mirana/tree/master/log) component.
 
+About checker, you can use "params" to specify expected parameter type list for checking the **parameters** of the corresponding object's function, and "results" for **results** return from the corresponding object's function ("results" was optional). note that, in **parameters** or **results**, value was set to string "nil" to escape from checking, and `maxDepth` was set to limit the max depth of nest table checking. at last,table type checking had a litte flaw at error information logging.
+
 As final note, you are recommended to use wrapper of tracer at the outermost layer to get the more accurate tracking results.
 
 ## **Useage**
@@ -25,4 +27,5 @@ object.http()
 
 ## **TODO**
 
-1. checker, autotest and more wrapper to be implemented later.
+1. wait for `table.nkeys()` to log more accurate error information when check failed in checker wrapper.
+2. autotest and more wrapper to be implemented later.
