@@ -9,6 +9,7 @@ local log = require("log.index")
 local newTable = require("toolkit.common").newTable
 
 -- taskGroup { h1, { param1, param2, ... }, ignore(true/false), cb1 }, ...
+-- note, empty params use {}, not nil
 --[[
     optional ignore means you don't care about the task result,  but you can use optional cb handle
     this task result.
@@ -27,13 +28,13 @@ return function()
                     cb(handler(...))
                 end
             end
-            thread, err = spawn(task[1], unpack(params or {}))
+            thread, err = spawn(task[1], unpack(params))
             if not thread then
                 content = "spawn thread failed, err: "..err
                 if ignore then
                     log.warn(content)
                 else
-                    thread[i] = { nil, content }
+                    thread[i] = { false, content }
                     i = i + 1
                 end
             else
@@ -48,13 +49,13 @@ return function()
         for j, t in ipairs(threads) do
             thread = t[1]
             if not thread then
-                resps[j] = { nil, t[2] }
+                resps[j] = { false, t[2] }
                 goto loopEnd
             end
 
             ok, resp = wait(thread)
             if not ok then
-                resps[j] = { nil, "wait thread failed, err: "..resp }
+                resps[j] = { false, "wait thread failed, err: "..resp }
             else
                 resps[j] = { resp }
             end

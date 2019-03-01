@@ -58,8 +58,8 @@ local echoToServer3()
     -- do something
 end
 
-params[3] = { pingDB, 1547914820, true, function(time) log.info("pong time: ", time) end }
-params[4] = { echoToServer3, nil, true  }
+params[3] = { pingDB, { 1547914820 }, true, function(time) log.info("pong time: ", time) end }
+params[4] = { echoToServer3, {}, true  }
 resps = parallelPro(params)
 for i, resp in ipiars(resps) do
     result, err = unpack(resp)

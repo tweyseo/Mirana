@@ -14,13 +14,14 @@ local Checker = common.newTable(0, 4)
 
 -- process array and hash mix
 local function tableCheck(refTab, tb, chain, depth)
-    --[[
-        params { 13, "tweyseo", nil } fit ref { "number", "string", "nil" }, so can't compare table
-        length here.
-    ]]
+    local refTabLen, tbLen = #refTab, #tb
+    if refTabLen ~= tbLen then
+        return false, "expect table length "..refTabLen.." but "..tbLen.." at "..chain
+    end
+
     local val, tp, refTp
     for k, ref in pairs(refTab) do
-        -- "nil" to escape from checking
+        -- string "nil" to escape from checking
         if ref ~= "nil" then
             val = tb[k]
             tp, refTp = type(val), type(ref)
@@ -50,7 +51,7 @@ end
 local function typeCheck(reference, ...)
     local val, tp, refTp
     for i, ref in ipairs(reference) do
-        -- "nil" to escape from checking
+        -- string "nil" to escape from checking
         if ref ~= "nil" then
             val = select(i, ...)
             tp, refTp = type(val), type(ref)

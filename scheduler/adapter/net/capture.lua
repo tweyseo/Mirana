@@ -8,6 +8,7 @@ local pairs = pairs
 local type = type
 local concat = table.concat
 -- include
+local common = require("toolkit.common")
 local utils = require("toolkit.utils")
 local conf = require("scheduler.conf").NET.HTTP
 
@@ -42,7 +43,7 @@ local function reqHandle(params)
         if contentType == nil then
             setHeader("Content-Type", conf.defaultContentType)
         end
-        if find(ngx.var.content_type, conf.defaultContentType, 1, true) then
+        if find(common.contentType(), conf.defaultContentType, 1, true) then
             params.body = utils.json_encode(params.body)
         end
         --Content-Length will automatic calculate later

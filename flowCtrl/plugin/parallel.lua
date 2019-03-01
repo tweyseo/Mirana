@@ -8,6 +8,7 @@ local wait = ngx.thread.wait
 local newTable = require("toolkit.common").newTable
 
 -- taskGroup { handler1, { param1, param2, ... }, ...
+-- note, empty params use {}, not nil
 return function()
     return function(...)
         local count = select('#', ...)
@@ -16,9 +17,9 @@ return function()
         for i = 1, count do
             task = select(i, ...)
             params = task[2]
-            thread, err = spawn(task[1], unpack(params or {}))
+            thread, err = spawn(task[1], unpack(params))
             if not thread then
-                threads[i] = { nil, "spawn thread failed, err: "..err }
+                threads[i] = { false, "spawn thread failed, err: "..err }
             else
                 threads[i] = { thread }
             end
@@ -27,13 +28,13 @@ return function()
         for i, t in ipairs(threads) do
             thread = t[1]
             if not thread then
-                resps[i] = { nil, t[2] }
+                resps[i] = { false, t[2] }
                 goto loopEnd
             end
 
             ok, resp = wait(thread)
             if not ok then
-                resps[i] = { nil, "wait thread failed, err: "..resp }
+                resps[i] = { false, "wait thread failed, err: "..resp }
             else
                 resps[i] = { resp }
             end

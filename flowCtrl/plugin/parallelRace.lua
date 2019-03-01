@@ -8,6 +8,7 @@ local log = require("log.index")
 local newTable = require("toolkit.common").newTable
 
 -- taskGroup { handler, { param1, param2, ... } }, ...
+-- note, empty params use {}, not nil
 return function()
     return function(...)
         local count = select('#', ...)
@@ -16,7 +17,7 @@ return function()
         for idx = 1, count do
             task = select(idx, ...)
             params = task[2]
-            thread, err = spawn(task[1], unpack(params or {}))
+            thread, err = spawn(task[1], unpack(params))
             if not thread then
                 log.warn("spawn thread failed, err: ", err)
             else

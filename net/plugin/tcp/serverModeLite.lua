@@ -30,7 +30,7 @@ return function()
         recv, err = sck:receiveuntil(pattern)
         if not recv then
             -- unrecoverable
-            errHandler(nil,  err)
+            errHandler(nil, err)
             return
         end
 

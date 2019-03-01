@@ -8,7 +8,7 @@ if not ok or type(newTab) ~= "function" then
     newTab = function() return {} end
 end
 
-local common = newTab(0, 6)
+local common = newTab(0, 7)
 
 function common.newTable(narr, nrec)
     return newTab(narr, nrec)
@@ -36,13 +36,21 @@ function common.reqTime()
     return ngx.var.request_time
 end
 
-function  common.elapsedTime(t)
+function common.elapsedTime(t)
     return common.curTime() - (t or 0)
 end
 
 function common.status()
     -- can not cache in lua var
     return ngx.var.status
+end
+
+--[[
+    ngx.var.content_type will be read repeatedly like in scheduler-capture, so cache it in
+    ngx.ctx.contentType at the stage of access_by_lua for better performance.
+]]
+function common.contentType()
+    return ngx.ctx.contentType
 end
 
 return common
