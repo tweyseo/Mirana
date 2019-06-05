@@ -3,7 +3,7 @@ local type = type
 local concat = table.concat
 local find = string.find
 -- include
-local defaultConf = require("net.conf").HTTP_CLIENT
+local defaultConf = require("net.conf")
 local mergeConf = require("toolkit.utils").mergeConf
 local newTable = require("toolkit.common").newTable
 local Http = require("resty.http")
@@ -16,14 +16,17 @@ local reqHandle = function(req, conf)
     if not req.headers then
         req.headers = newTable(0, 1)
     end
-    local headers = req.headers
-    if headers["Content-Type"] == nil then
-        headers["Content-Type"] = conf.defaultContentType
-    end
-    if  find(headers["Content-Type"], conf.defaultContentType, 1, true) then
-        req.body = helper.jsonSerialize(req.body)
-    end
 
+    local headers = req.headers
+    local ct = headers["Content-Type"]
+    if ct == nil then
+        headers["Content-Type"] = conf.defaultContentType
+        req.body = helper.jsonSerialize(req.body)
+    else
+        if find(ct, conf.defaultContentType, 1, true) then
+            req.body = helper.jsonSerialize(req.body)
+        end
+    end
     -- "Content-Length" will be calculated before send the request out in resty-http's send_request.
     return req
 end
@@ -65,7 +68,7 @@ return function()
         if not httpClient then
             return nil, err
         end
-        conf = mergeConf(conf, defaultConf)
+        conf = mergeConf(conf, defaultConf.HTTP_CLIENT)
         httpClient:set_timeouts(conf.connectTimeout, conf.sendTimeout, conf.readTimeout)
         -- connect
         local ok
@@ -74,7 +77,7 @@ return function()
             return nil, err
         end
         -- send
-        local resp
+        local errTimeout, resp = defaultConf.PUBLIC.ERROR.Timeout
         resp, err = httpClient:request(reqHandle(req, conf))
         if not resp then
             -- recv status and headers in httpClient:request
@@ -83,13 +86,13 @@ return function()
                 connection (note that, read timeout error is the only error that is not fatal), and
                 if you call close on a closed connection, you will get the "closed" error.
             ]]
-            if err == "timeout" then
+            if err == errTimeout then
                 ok, err = httpClient:close()
                 if not ok then
                     log.warn("close socket error: ", err)
                 end
 
-                err = "timeout"
+                err = errTimeout
             end
 
             return nil, err
@@ -103,13 +106,13 @@ return function()
                 connection (note that, read timeout error is the only error that is not fatal), and
                 if you call close on a closed connection, you will get the "closed" error.
             ]]
-            if err == "timeout" then
+            if err == errTimeout then
                 ok, err = httpClient:close()
                 if not ok then
                     log.warn("close socket error: ", err)
                 end
 
-                err = "timeout"
+                err = errTimeout
             end
 
             return nil, err

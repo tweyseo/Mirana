@@ -1,4 +1,9 @@
 return {
+    PUBLIC = {
+        ERROR = {
+            Timeout = "timeout"
+        }
+    },
     TCP_CLIENT = {
         maxIdleTimeout = 2 * 60 * 1000, -- ms
         poolSize = 200,

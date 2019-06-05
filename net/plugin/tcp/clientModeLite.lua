@@ -4,7 +4,7 @@
 local tcpClient = ngx.socket.tcp
 -- include
 local log = require("log.index")
-local defaultConf = require("net.conf").TCP_CLIENT
+local defaultConf = require("net.conf")
 local helper = require("net.plugin.helper")
 local mergeConf = require("toolkit.utils").mergeConf
 
@@ -14,7 +14,7 @@ return function()
     return function(conf, req)
         -- create
         local sck = tcpClient()
-        conf = mergeConf(conf, defaultConf)
+        conf = mergeConf(conf, defaultConf.TCP_CLIENT)
         sck:settimeouts(conf.connectTimeout, conf.sendTimeout, conf.readTimeout)
         local ok, err
         -- connect
@@ -45,7 +45,7 @@ return function()
         if not recv then
             return nil, err
         end
-        local recvData
+        local errTimeout, recvData = defaultConf.PUBLIC.ERROR.Timeout
         recvData, err = recv()
         if not recvData then
             --[[
@@ -53,13 +53,13 @@ return function()
                 connection (note that, read timeout error is the only error that is not fatal),
                 and if you call close on a closed connection, you will get the "closed" error.
             ]]
-            if err == "timeout" then
+            if err == errTimeout then
                 ok, err = sck:close()
                 if not ok then
                     log.warn("close socket error: ", err)
                 end
 
-                err = "timeout"
+                err = errTimeout
             end
 
             return nil, err

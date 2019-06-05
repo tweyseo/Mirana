@@ -45,12 +45,4 @@ function common.status()
     return ngx.var.status
 end
 
---[[
-    ngx.var.content_type will be read repeatedly like in scheduler-capture, so cache it in
-    ngx.ctx.contentType at the stage of access_by_lua for better performance.
-]]
-function common.contentType()
-    return ngx.ctx.contentType
-end
-
 return common

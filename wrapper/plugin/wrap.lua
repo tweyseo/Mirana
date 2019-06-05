@@ -73,8 +73,8 @@ return function(wrapper, originalObject, opt)
         end
 
         return function(...)
-            return wrapper:leave(self, index, wrapper:entry(self, index, ...)
-                , originalObject[index](...))
+            return wrapper:leave(self, index, wrapper:entry(self, index, ...),
+                originalObject[index](...))
         end
     end})
 end

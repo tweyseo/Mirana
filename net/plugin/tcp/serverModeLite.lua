@@ -1,7 +1,7 @@
 -- function reference
 local tcpServer = ngx.req.socket
 -- include
-local defaultConf = require("net.conf").TCP_SERVER
+local defaultConf = require("net.conf")
 local helper = require("net.plugin.helper")
 local mergeConf = require("toolkit.utils").mergeConf
 local log = require("log.index")
@@ -22,7 +22,7 @@ return function()
             errHandler(nil, err)
             return
         end
-        conf = mergeConf(conf, defaultConf)
+        conf = mergeConf(conf, defaultConf.TCP_SERVER)
         sck:settimeouts(conf.connectTimeout, conf.sendTimeout, conf.readTimeout)
         -- receive
         local pattern = conf.pattern
@@ -35,6 +35,7 @@ return function()
         end
 
         local recvData, req, resp, sendData, bytes, ok, continue
+        local errTimeout  = defaultConf.PUBLIC.ERROR.Timeout
         repeat
             ::rcvLoop::
             recvData, err = recv()
@@ -44,7 +45,7 @@ return function()
                     connection (note that, read timeout error is the only error that is not fatal),
                     and if you call close on a closed connection, you will get the "closed" error.
                 ]]
-                if err == "timeout" then
+                if err == errTimeout then
                     -- recoverable
                     if errHandler(nil, err) == true then
                         goto rcvLoop

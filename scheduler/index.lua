@@ -37,10 +37,6 @@ local scheduler = {
 local adapters = {
     [scheduler.HTTP] = requireTable.http,
     [scheduler.CAPTURE] = requireTable.capture,
-    --[[
-        it's recommended to use scheduler.HTTP + flowCtrl.parallel
-        instead of scheduler.CAPTURE_MULTI
-    ]]
     [scheduler.CAPTURE_MULTI] = requireTable.captureMulti,
     [scheduler.TCP] = requireTable.tcp,
     [scheduler.REDIS] = requireTable.redis,
@@ -52,7 +48,7 @@ local plugins = {
 }
 
 local function resolve(mode)
-    local m, p = mode, {}
+    local m, p = mode, nil
     if type(mode) == "table" then
         m = mode[1]
         p = mode[2]
@@ -69,7 +65,7 @@ local attr = { __call = function(_, mode, ...)
         local m, p = resolve(mode)
 
         local adp = adapters[m]
-        if not adp then
+        if adp == nil then
             return nil, "invalid adapter mode"
         end
 
@@ -77,7 +73,7 @@ local attr = { __call = function(_, mode, ...)
             local plg
             for _, index in ipairs(p) do
                 plg = plugins[index]
-                if not plg then
+                if plg == nil then
                     return nil, "invalid plugin mode"
                 end
                 adp = plg:wrap(adp)

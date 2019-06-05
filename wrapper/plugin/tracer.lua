@@ -17,13 +17,12 @@ local function add(source, functionName, elapsedTime)
 
     local content = ngx.ctx.trace
     --[[
-        after comparison, i found '..' performance better than table.concat when
-        the string is not to long but to much operation of string concatenation,
-        oppositely, table.concat performance better than '..' when the string is
-        a little long but not too much operation of string concatenation.
-        so i use '..' to concatenate string here and add them to the queue, because
-        trace queue count may be huge, and use table.concat concatenate them at
-        log_by_lua stage later.
+        after comparison, i found '..' performance better than table.concat when the string is not
+        to long but to much operation of string concatenation, oppositely, table.concat performance
+        better than '..' when the string is a little long but not too much operation of string
+        concatenation.
+        so i use '..' to concatenate string here and add them to the queue, because log queue count
+        may be huge, and use table.concat concatenate them at log_by_lua stage later.
     ]]
     -- optimize: if the length of content is more than 10000, consider cache the length.
     content[#content + 1] = conf.prefix..source..":"..functionName.."(), elapsed:"..elapsedTime
