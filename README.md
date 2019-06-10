@@ -14,7 +14,7 @@ There are glance of these common components:
 - [**flowCtrl:**](https://github.com/tweyseo/Mirana/tree/master/flowCtrl) control the workflow of your code (parallel, parallelRace, parallelPro and so on).
 - [**log:**](https://github.com/tweyseo/Mirana/tree/master/log) unify and standardize the log system.
 - [**net:**](https://github.com/tweyseo/Mirana/tree/master/net) wrap a simple network communication (TCP, HTTP and so on).
-- [**scheduler:**](https://github.com/tweyseo/Mirana/tree/master/scheduler) expected to be the unified scheduling layer for some common components (net, storage and so on).
+- [**scheduler:**](https://github.com/tweyseo/Mirana/tree/master/scheduler) sidecar like, expected to be the unified scheduling layer for some common components (net, storage and so on).
 - [**storage:**](https://github.com/tweyseo/Mirana/tree/master/storage) wrap a simple storage (redis, rediscluster and so on).
 - [**toolkit:**](https://github.com/tweyseo/Mirana/tree/master/toolkit) common utils (auto require, dump table, json encode/decode an so on).
 - [**wrapper:**](https://github.com/tweyseo/Mirana/tree/master/wrapper) wrapper for advanced features (tracer and so on).
