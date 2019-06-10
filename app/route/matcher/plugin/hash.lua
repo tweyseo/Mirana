@@ -3,7 +3,7 @@ local setmetatable = setmetatable
 local type = type
 local pairs = pairs
 local ipairs = ipairs
-local find = ngx.re.find -- todo: add resty.core
+local find = ngx.re.find
 local insert = table.insert
 local lower = string.lower
 local error = error
@@ -27,7 +27,7 @@ function Hash:new()
     --[[
         to implement the idea of the onion model and more easier generation of static routes, the
         middlewares and the errHandlers was grouped by path length, like onions. the middlewares
-        was grouped in order from short to long, and which was inverse in the errHandlers.
+        were grouped in order from short path to long, and which was inverse in the errHandlers.
     ]]
     --[[
         { { path1 = { function1, function2, ... } , path2 = { function1, function2, ... }, ... }
