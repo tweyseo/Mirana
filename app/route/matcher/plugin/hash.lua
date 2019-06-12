@@ -78,8 +78,10 @@ local function dynamicArray(array, cursor, index)
         return cursor
     end
 
+    local len = #array
     for _ = 1, index - cursor do
-        insert(array, {})
+        len = len + 1
+        array[len] = {}
     end
     -- return index as new cursor
     return index
@@ -131,16 +133,20 @@ local function collectHandlers(groups, srcPath)
     for groupId, group in ipairs(groups) do
         -- root path and can be empty
         if groupId == rootGroupId and group[conf.rootPath] ~= nil then
+            local len = #handlerList
             for _, func in ipairs(group[conf.rootPath]) do
-                insert(handlerList, func)
+                len = len + 1
+                handlerList[len] = func
             end
         else
             for path, funcList in pairs(group) do
                 -- filter with length first, and additionalLength is length of caret and slash
                 if #srcPath >= #path - additionalLength
                     and find(srcPath..conf.slash, path, "jo") ~= nil then
+                    local len = #handlerList
                     for _, func in ipairs(funcList) do
-                        insert(handlerList, func)
+                        len = len + 1
+                        handlerList[len] = func
                     end
                 end
             end
