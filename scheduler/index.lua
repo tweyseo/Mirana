@@ -17,7 +17,7 @@ autoRequire(requirePath, requireTable)
 -- manual require which not in adapter
 requireTable.tcp = require("net.index").TCP_CLIENT_LITE
 requireTable.redis = require("storage.index").REDIS_LITE
-requireTable.rediscluste = require("storage.index").REDISCLUSTER_LITE
+requireTable.rediscluster = require("storage.index").REDISCLUSTER_LITE
 
 local scheduler = {
     -- net
