@@ -59,7 +59,7 @@ function Request:new()
     return instance
 end
 
-function Request:found()
+function Request:hasFound()
     return self.found
 end
 
