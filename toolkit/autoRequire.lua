@@ -55,7 +55,7 @@ local function fileHandle(self, fullPath, requireTable)
     end
 
     -- do wrapper
-    for _,  wrapper in ipairs(self.wrappers) do
+    for _, wrapper in ipairs(self.wrappers) do
         if wrapper then
             -- source for tracer wrapper and checker wrapper
             -- name for checker wrapper

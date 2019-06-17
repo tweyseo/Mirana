@@ -1,6 +1,5 @@
 -- function reference
 local select = select
-local remove = table.remove
 local unpack = unpack
 -- include
 local Redis = require("resty.redis")
@@ -48,8 +47,7 @@ return function()
         -- execute
         local function execute(self, cmd)
             local method = self[cmd[1]]
-            remove(cmd, 1)
-            return method(self, unpack(cmd))
+            return method(self, unpack(cmd, 2))
         end
         local count, selectdb, result, cmd = select('#', ...), false
         if count == 1 then

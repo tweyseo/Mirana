@@ -1,6 +1,5 @@
 -- function reference
 local select = select
-local remove = table.remove
 local unpack = unpack
 -- include
 local Rediscluster = require("rediscluster")
@@ -22,8 +21,7 @@ return function()
          -- execute
         local function execute(self, cmd)
             local method = self[cmd[1]]
-            remove(cmd, 1)
-            return method(self, unpack(cmd))
+            return method(self, unpack(cmd, 2))
         end
         local count = select('#', ...)
         local result, cmd
