@@ -3,7 +3,7 @@ local get_headers = ngx.req.get_headers
 local read_body = ngx.req.read_body
 local type = type
 local concat = table.concat
-local find = ngx.re.find
+local find = string.find
 local get_post_args = ngx.req.get_post_args
 local get_body_data = ngx.req.get_body_data
 local setmetatable = setmetatable
@@ -29,9 +29,9 @@ function Request:new()
     local ct = ngx.ctx['Content-Type'] or headers['Content-Type']
     if type(ct) == "table" then ct = concat(ct, "; ") end
     if ct then
-        if find(ct, reqConf.contentType[1], "jo") then
+        if find(ct, reqConf.contentType[1], 1, true) then
             body = get_post_args()
-        elseif find(ct, reqConf.contentType[2], "jo") then
+        elseif find(ct, reqConf.contentType[2], 1, true) then
             rawBody = get_body_data()
             body = utils.json_decode(rawBody)
         end
