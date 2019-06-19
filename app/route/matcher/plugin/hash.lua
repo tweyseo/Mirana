@@ -142,7 +142,7 @@ local function collectHandlers(groups, srcPath)
             for path, funcList in pairs(group) do
                 -- filter with length first, and additionalLength is length of caret and slash
                 if #srcPath >= #path - additionalLength
-                    and find(srcPath..conf.slash, path, 1, true) ~= nil then
+                    and find(srcPath..conf.slash, path, "jo") ~= nil then
                     local len = #handlerList
                     for _, func in ipairs(funcList) do
                         len = len + 1
