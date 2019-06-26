@@ -1,5 +1,6 @@
 -- function reference
 local pcall = pcall
+local error = error
 local type = type
 local pairs = pairs
 local ipairs = ipairs
@@ -10,7 +11,23 @@ local getmetatable = getmetatable
 -- include
 local log = require("log.index")
 local json = require("cjson")
-local jd = require("json_decoder")
+local ok, jd = pcall(require, "json_decoder")
+local decode
+if ok then
+    decode = function(json_value)
+        local jd_ins = jd.new()
+        local lua_value, err = jd_ins:decode(json_value)
+        if not lua_value then
+            error(err)
+        end
+
+        return lua_value
+    end
+else
+    decode = function(json_value)
+        return json.decode(json_value)
+    end
+end
 local newTable = require("toolkit.common").newTable
 
 -- wrappers for third party libraries
@@ -31,14 +48,7 @@ end
 
 function utils.json_decode(json_value)
     local lua_value
-    pcall(function(v)
-        local jd_ins = jd.new()
-        local err
-        lua_value, err = jd_ins:decode(v)
-        if not lua_value then
-            error(err)
-        end
-    end, json_value)
+    pcall(function(v) lua_value = decode(v) end, json_value)
     return lua_value
 end
 
