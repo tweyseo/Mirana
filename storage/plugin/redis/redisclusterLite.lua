@@ -2,7 +2,14 @@
 local select = select
 local unpack = unpack
 -- include
-local Rediscluster = require("rediscluster")
+local ok, Rediscluster = pcall(require, "rediscluster")
+if not ok then
+    Rediscluster = {
+        new = function()
+            return nil, "can not find library : rediscluster"
+        end
+    }
+end
 local defaultConf = require("storage.conf").REDISCLUSTER
 local mergeConf = require("toolkit.utils").mergeConf
 
