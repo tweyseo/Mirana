@@ -1,4 +1,9 @@
 return {
+    PUBLIC = {
+        ERROR = {
+            Timeout = "timeout"
+        }
+    },
     REDIS = {
         addr = "127.0.0.1",
         port = 6379,
@@ -22,5 +27,13 @@ return {
         connection_timout = 3000,   --ms
         max_redirection = 2,
         auth = "12345690"
+    },
+    KEYSPACENOTIFICATION = {
+        addr = "127.0.0.1",
+        port = 6379,
+        timeout = 3000, -- ms
+        auth = "",
+        pattern = "__keyevent@0__:expired",
+        readInterval = 1000 -- ms
     }
 }

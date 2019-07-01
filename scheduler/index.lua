@@ -18,6 +18,7 @@ autoRequire(requirePath, requireTable)
 requireTable.tcp = require("net.index").TCP_CLIENT_LITE
 requireTable.redis = require("storage.index").REDIS_LITE
 requireTable.rediscluster = require("storage.index").REDISCLUSTER_LITE
+requireTable.keyspaceNotification = require("storage.index").KEYSPACENOTIFICATION
 
 local scheduler = {
     -- net
@@ -28,6 +29,7 @@ local scheduler = {
     -- storage
     REDIS = 11,
     REDISCLUSTER = 12,
+    KEYSPACENOTIFICATION = 13,
 
     plugin = {
         BREAKER = 2^0
@@ -40,7 +42,8 @@ local adapters = {
     [scheduler.CAPTURE_MULTI] = requireTable.captureMulti,
     [scheduler.TCP] = requireTable.tcp,
     [scheduler.REDIS] = requireTable.redis,
-    [scheduler.REDISCLUSTER] = requireTable.rediscluster
+    [scheduler.REDISCLUSTER] = requireTable.rediscluster,
+    [scheduler.KEYSPACENOTIFICATION] =  requireTable.keyspaceNotification
 }
 
 local plugins = {
