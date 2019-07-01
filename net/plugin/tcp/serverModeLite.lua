@@ -1,5 +1,6 @@
 -- function reference
 local tcpServer = ngx.req.socket
+local exiting = ngx.worker.exiting
 -- include
 local defaultConf = require("net.conf")
 local helper = require("net.plugin.helper")
@@ -38,6 +39,9 @@ return function()
         local errTimeout  = defaultConf.PUBLIC.ERROR.Timeout
         repeat
             ::rcvLoop::
+            if exiting() == true then
+                return
+            end
             recvData, err = recv()
             if not recvData then
                 --[[
