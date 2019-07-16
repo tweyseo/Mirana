@@ -1,13 +1,15 @@
 -- function reference
-local ipairs = ipairs
+local pairs = pairs
 local type = type
 local setmetatable = setmetatable
 -- include
 local newTable = require("toolkit.common").newTable
 local AutoRequire = require("toolkit.autoRequire")
+local bit = require("bit")
 -- const
 local regex = [[(?<path>\/\w+\/\w+\/\w+\/(?<objectName>\w+))\.]]
 local requirePath = "/app/share/scheduler/adapter"
+local adapterIdx, pluginIdx = 1, 2
 
 -- auto require
 local requireTable = newTable(0, 16)
@@ -32,7 +34,8 @@ local scheduler = {
     KEYSPACENOTIFICATION = 13,
 
     plugin = {
-        BREAKER = 2^0
+        CODE_ESCAPE = 2^0,
+        BREAKER = 2^1
     }
 }
 
@@ -47,39 +50,42 @@ local adapters = {
 }
 
 local plugins = {
-    [scheduler.plugin.BREAKER] = "implement it later",
+    [scheduler.plugin.CODE_ESCAPE] = "implement it later",
+    [scheduler.plugin.BREAKER] = "implement it later"
 }
 
 local function resolve(mode)
-    local m, p = mode, nil
+    local a, p = mode, nil
     if type(mode) == "table" then
-        m = mode[1]
-        p = mode[2]
+        a = mode[adapterIdx]
+        p = mode[pluginIdx]
     end
 
-    return m, p
+    return a, p
 end
 
 --[[
     mode should be scheduler.HTTP or { scheduler.HTTP }
-        or { scheduler.HTTP, { scheduler.plugin.BREAKER, ... } }
+        or { scheduler.HTTP, scheduler.plugin.BREAKER + scheduler.plugin.BREAKER + ... }
 ]]
 local attr = { __call = function(_, mode, ...)
-        local m, p = resolve(mode)
+        local a, p = resolve(mode)
 
-        local adp = adapters[m]
+        local adp = adapters[a]
         if adp == nil then
             return nil, "invalid adapter mode"
         end
 
-        if type(p) == "table" then
+        if p ~= nil then
             local plg
-            for _, index in ipairs(p) do
-                plg = plugins[index]
-                if plg == nil then
-                    return nil, "invalid plugin mode"
+            for _, v in pairs(scheduler.plugin) do
+                if bit.band(p, v) ~= 0 then
+                    plg = plugins[v]
+                    if plg == nil then
+                        return nil, "invalid plugin mode"
+                    end
+                    adp = plg:wrap(adp)
                 end
-                adp = plg:wrap(adp)
             end
         end
 
