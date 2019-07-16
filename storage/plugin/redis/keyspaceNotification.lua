@@ -48,6 +48,10 @@ return function()
         end
 
         -- psubscribe
+        --[[
+            Although subscribe has better performance than psubscribe, but psubscribe support
+            wildcard.
+        ]]
         rc:psubscribe(pattern or conf.pattern)
 
         -- read
