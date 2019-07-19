@@ -30,6 +30,7 @@ function common.reqId()
 end
 
 common.curTime = ngx.now
+common.curTimeSec = ngx.time
 
 function common.reqTime()
     -- can not cache in lua var
