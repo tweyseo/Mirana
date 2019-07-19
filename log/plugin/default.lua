@@ -1,7 +1,9 @@
 -- function reference
+local pairs = pairs
+local DEBUG, INFO, NOTICE, WARN, ERR = ngx.DEBUG, ngx.INFO, ngx.NOTICE, ngx.WARN, ngx.ERR
+local upper = string.upper
 local getinfo = debug.getinfo
 local log = ngx.log
-local DEBUG, INFO, NOTICE, WARN, ERR = ngx.DEBUG, ngx.INFO, ngx.NOTICE, ngx.WARN, ngx.ERR
 local select = select
 local concat = table.concat
 -- include
@@ -14,54 +16,16 @@ end
 
 local logger = common.newTable(0, 14)
 
-function logger.debug(...)
-    local level = DEBUG
-    if level > errlog.get_sys_filter_level() then
-        return
+for k, level in pairs({ debug = DEBUG, info = INFO, notice = NOTICE, warn = WARN, err = ERR }) do
+    logger[upper(k)] = level
+    logger[k] = function(...)
+        if level > errlog.get_sys_filter_level() then
+            return
+        end
+
+        local info = getinfo(2, "Sl")
+        log(level, info.short_src, ":", info.currentline, " ", ...)
     end
-
-    local info = getinfo(2, "Sl")
-    log(level, info.short_src, ":", info.currentline, " ", ...)
-end
-
-function logger.info(...)
-    local level = INFO
-    if level > errlog.get_sys_filter_level() then
-        return
-    end
-
-    local info = getinfo(2, "Sl")
-    log(level, info.short_src, ":", info.currentline, " ", ...)
-end
-
-function logger.notice(...)
-    local level = NOTICE
-    if level > errlog.get_sys_filter_level() then
-        return
-    end
-
-    local info = getinfo(2, "Sl")
-    log(level, info.short_src, ":", info.currentline, " ", ...)
-end
-
-function logger.warn(...)
-    local level = WARN
-    if level > errlog.get_sys_filter_level() then
-        return
-    end
-
-    local info = getinfo(2, "Sl")
-    log(level, info.short_src, ":", info.currentline, " ", ...)
-end
-
-function logger.err(...)
-    local level = ERR
-    if level > errlog.get_sys_filter_level() then
-        return
-    end
-
-    local info = getinfo(2, "Sl")
-    log(level, info.short_src, ":", info.currentline, " ", ...)
 end
 
 function logger.add(level, ...)
@@ -104,11 +68,5 @@ end
 function logger.overview(...)
     log(conf.overviewLevel, ...)
 end
-
-logger.DEBUG = DEBUG
-logger.INFO = INFO
-logger.NOTICE = NOTICE
-logger.WARN = WARN
-logger.ERR = ERR
 
 return logger
