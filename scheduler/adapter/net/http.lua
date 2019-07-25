@@ -11,7 +11,7 @@ local function parseUri(uri)
         return nil, err and ("match uri: "..uri..", err: "..err) or ("bad uri: "..uri)
     end
 
-    return ret[1], tonumber(ret[2] or 80), ret[3] or "/", ret[4]
+    return ret[1], tonumber(ret[2] or 80), ret[3] or "/", ret[4] or ""
 end
 
 -- uri(string, like:http://192.25.106.105:29527/ping)
