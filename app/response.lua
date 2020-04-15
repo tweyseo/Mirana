@@ -44,12 +44,16 @@ function Response:send(content, f)
     print(content)
     if f == true then
         flush()
+        return ngx.status, ngx.resp.get_headers(), content, "flush"
     end
+
+    -- for wrapper-tracer dump results
+    return ngx.status, ngx.resp.get_headers(), content
 end
 
 function Response:json(data, f)
     self:addHeader('Content-Type', 'application/json')
-    self:send(utils.json_encode(data), f)
+    return self:send(utils.json_encode(data), f)
 end
 
 return Response

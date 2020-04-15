@@ -6,7 +6,8 @@ local httpClient = require("net.index").HTTP_CLIENT_LITE
 local conf = require("scheduler.conf").NET.HTTP
 
 local function parseUri(uri)
-    local ret, err = match(uri, conf.defaultURLRegex, "jo")
+    -- URI was changed with business, so don't use "jo"(jit and cacahe)
+    local ret, err = match(uri, conf.defaultURLRegex)
     if not ret then
         return nil, err and ("match uri: "..uri..", err: "..err) or ("bad uri: "..uri)
     end

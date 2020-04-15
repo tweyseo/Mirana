@@ -28,6 +28,9 @@ for k, level in pairs({ debug = DEBUG, info = INFO, notice = NOTICE, warn = WARN
     end
 end
 
+local logLvStrMap = { [DEBUG] = "debug", [INFO] = "info", [NOTICE] = "notice", [WARN] = "warn"
+    , [ERR] = "err" }
+
 function logger.add(level, ...)
     if level > errlog.get_sys_filter_level() then
         return
@@ -50,7 +53,7 @@ function logger.add(level, ...)
         may be huge, and use table.concat concatenate them at log_by_lua stage later.
     ]]
     -- optimize: if the length of content is more than 10000, consider cache the length.
-    content[#content + 1] = conf.prefix..dst..", time:"..common.curTime()
+    content[#content + 1] = conf.prefix..logLvStrMap[level].."] "..dst..", time:"..common.curTime()
 end
 
 local function format(content)

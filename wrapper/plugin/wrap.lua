@@ -6,6 +6,7 @@ local setmetatable = setmetatable
 local newTable = require("toolkit.common").newTable
 -- const
 local defaultTableLen = 5
+local defaultSkip = true
 
 -- optimize: original object reflection and function copy
 local function filter(wrapper, originalObject)
@@ -14,9 +15,14 @@ local function filter(wrapper, originalObject)
         return true
     end
 
-    local except, reflection, skip, inverse, details
-        = wrapper.except, originalObject.reflection, false, wrapper.inverse or false
-    if not except then
+    -- skip(or not, see value of defaultSkip) originalObject by default
+    local reflection = originalObject.reflection
+    if reflection == nil then
+        return defaultSkip
+    end
+
+    local except, skip, inverse, details = wrapper.except, false, wrapper.inverse or false
+    if except == nil then
         skip = false
         goto rtn
     end
@@ -73,8 +79,7 @@ return function(wrapper, originalObject, opt)
         end
 
         return function(...)
-            return wrapper:leave(self, index, wrapper:entry(self, index, ...),
-                originalObject[index](...))
+            return wrapper:leave(self, index, wrapper:entry(self, ...), property(...))
         end
     end})
 end

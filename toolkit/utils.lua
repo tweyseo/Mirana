@@ -38,7 +38,7 @@ function utils.json_encode(lua_value, empty_table_as_object)
     local json_value
     if json.encode_empty_table_as_object then
         -- empty table encoded as array default
-        json.encode_empty_table_as_object(empty_table_as_object or true)
+        json.encode_empty_table_as_object(empty_table_as_object or false)
     end
     -- prevent from excessively sparse array
     json.encode_sparse_array(true)

@@ -31,6 +31,7 @@ end
 
 common.curTime = ngx.now
 common.curTimeSec = ngx.time
+common.updateTime = ngx.update_time
 
 function common.reqTime()
     -- can not cache in lua var

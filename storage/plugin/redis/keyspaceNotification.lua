@@ -7,28 +7,40 @@ local errTimeout = require("storage.conf").PUBLIC.ERROR.Timeout
 local mergeConf = require("toolkit.utils").mergeConf
 local log = require("log.index")
 
--- set notify-keyspace-events to "Esx" to set key event + set + expired
+local function close(rc)
+    local ok, err = rc:close()
+    if not ok then
+        -- just log warn
+        log.warn("close redis error: ", err)
+    end
+end
+
+--[[
+    set notify-keyspace-events to "Esx" to set key event + set + expired
+    or
+    set notify-keyspace-events to "Ex" to set key event + expired
+]]
 return function()
     -- conf see storage.conf.KEYSPACENOTIFICATION
-    --[[
-        handler(recvData)  and errHandler(pattern, err) are both return true or false to continue
-        recv loop or not.
-    ]]
+    -- handler return true or false to continue recv loop or not
+    -- errHandler was to handle(e.g. to reconnect) the unrecoverable error
     return function(conf, pattern, handler, errHandler)
         -- init
         conf = mergeConf(conf, defaultConf)
         local rc, err, ok
         rc, err = Redis:new()
         if not rc then
-            return nil, err
+            return errHandler("create redis client failed, error: "..err)
         end
         rc:set_timeout(conf.timeout)
 
         -- connect
         ok, err = rc:connect(conf.addr, conf.port)
         if not ok then
-            return nil, err
+            return errHandler("connect redis server failed, error: "..err)
         end
+
+        log.warn("connect redis server successfully")
 
         -- auth
         local auth = conf.auth
@@ -43,7 +55,8 @@ return function()
                 ok = true
             end
             if not ok then
-                return nil, err
+                close(rc)
+                return errHandler("redis auth failed, error: "..err)
             end
         end
 
@@ -52,45 +65,35 @@ return function()
             Although subscribe has better performance than psubscribe, but psubscribe support
             wildcard.
         ]]
-        rc:psubscribe(pattern or conf.pattern)
+        pattern = pattern or conf.pattern
+        ok, err = rc:psubscribe(pattern)
+        if not ok then
+            close(rc)
+            return errHandler("redis psubscribe failed, error: "..err)
+        end
 
-        -- read
+        log.warn("redis psubscribe successfully and start to read reply")
+        -- recv loop
         rc:set_timeout(conf.readInterval)
         local recvData
         repeat
             ::rcvLoop::
             if exiting() == true then
-                return
+                -- auto gc
+                return true
             end
             recvData, err = rc:read_reply()
-            if not recvData then
+            if recvData == nil then
                 if err == errTimeout then
                     goto rcvLoop
                 else
-                    errHandler = errHandler or function(key, error)
-                            log.warn("read "..key.." reply error: ", error)
-                            return false
-                        end
-                    -- recoverable
-                    if errHandler(pattern, err) == true then
-                        goto rcvLoop
-                    end
-
-                    ok, err = rc:close()
-                    if not ok then
-                        log.warn("close redis error: ", err)
-                    end
-
-                    return
+                    close(rc)
+                    return errHandler("read ["..pattern.."] reply failed, error: "..err)
                 end
             else
                 if handler(recvData) == false then
-                    ok, err = rc:close()
-                    if not ok then
-                        log.warn("close redis error: ", err)
-                    end
-
-                    return
+                    close(rc)
+                    return errHandler("data error was unrecoverable")
                 end
             end
         until(false)

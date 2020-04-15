@@ -74,7 +74,7 @@ app:errUse(function(err, _, _, next) print("use-eh-root1: ", err) next(err) end)
 app:errUse("/test1", function(err, _, _, next)  print("use-eh-test1-1: ", err) next(err) end)
 
 -- add URI handler
-app:get("/test1/test2", function(_, resp) print("handle-test2") resp:send() end)
+app:get("/test1/test2", function(_, resp) print("handle-test2") return resp:send() end)
 
 -- run
 app:run(function(err)
